@@ -9,6 +9,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{724331BE
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sunlix.NET.Primitives", "src\Sunlix.NET.Primitives\Sunlix.NET.Primitives.csproj", "{A3F6FD3B-319A-4563-AEF7-9953BF8CBAAD}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sunlix.NET.Primitives.Tests", "tests\Sunlix.NET.Primitives.Tests\Sunlix.NET.Primitives.Tests.csproj", "{E87C54C4-EA34-449E-99C3-C0B8F5C093D0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -19,12 +21,17 @@ Global
 		{A3F6FD3B-319A-4563-AEF7-9953BF8CBAAD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A3F6FD3B-319A-4563-AEF7-9953BF8CBAAD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A3F6FD3B-319A-4563-AEF7-9953BF8CBAAD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E87C54C4-EA34-449E-99C3-C0B8F5C093D0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E87C54C4-EA34-449E-99C3-C0B8F5C093D0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E87C54C4-EA34-449E-99C3-C0B8F5C093D0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E87C54C4-EA34-449E-99C3-C0B8F5C093D0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{A3F6FD3B-319A-4563-AEF7-9953BF8CBAAD} = {D677EF68-4058-403A-B665-69E16540F12D}
+		{E87C54C4-EA34-449E-99C3-C0B8F5C093D0} = {724331BE-E215-4809-909A-BA3A142F0D16}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {612D341E-ADC3-4446-B909-65197CC22933}
