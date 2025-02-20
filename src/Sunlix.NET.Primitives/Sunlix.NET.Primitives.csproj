@@ -11,15 +11,15 @@
 
   <PropertyGroup>
     <PackageId>Sunlix.NET.Primitives</PackageId>
-    <Version>1.0.0</Version>
+    <Version>1.0.1</Version>
     <Authors>Igor Bzovsky</Authors>
     <Company>Sunlix</Company>
     <Description>Sunlix.NET.Primitives is a lightweight library providing fundamental types for object-oriented programming and domain-driven design (DDD), including Entity, ValueObject, and Enumeration.</Description>
     <PackageTags>Sunlix, Primitives, DDD, Entity, ValueObject, Enumeration</PackageTags>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <RepositoryUrl>https://github.com/Sunlix-Solutions/Sunlix.NET.Primitives</RepositoryUrl>
+    <RepositoryUrl>https://github.com/Sunlix-Software/Sunlix.NET.Primitives</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
-    <PackageProjectUrl>https://github.com/Sunlix-Solutions/Sunlix.NET.Primitives</PackageProjectUrl>
+    <PackageProjectUrl>https://github.com/Sunlix-Software/Sunlix.NET.Primitives</PackageProjectUrl>
     <PackageIcon>sunlix.png</PackageIcon>
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
