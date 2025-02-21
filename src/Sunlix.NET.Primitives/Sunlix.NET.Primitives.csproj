@@ -1,11 +1,11 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <None Include="assets/sunlix.png" Pack="true" PackagePath="/" />
+    <None Include="pack/sunlix.png" Pack="true" PackagePath="/" />
   </ItemGroup>
 
   <PropertyGroup>
-    <TargetFramework>net6.0;net8.0;net9.0</TargetFramework>
+    <TargetFrameworks>net6.0;net8.0;net9.0</TargetFrameworks>
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
@@ -14,7 +14,7 @@
     <Version>1.0.2</Version>
     <Authors>Igor Bzovsky</Authors>
     <Company>Sunlix</Company>
-    <Description>Sunlix.NET.Primitives is a lightweight library providing fundamental types for object-oriented programming and domain-driven design (DDD), including Entity, ValueObject, and Enumeration.</Description>
+    <Description>Sunlix.NET.Primitives is a lightweight library providing a set of key types for structured domain modeling in C#. It includes Entity, ValueObject, Enumeration, Unit, and Error, which are particularly useful in domain-driven design (DDD).</Description>
     <PackageTags>Sunlix, Primitives, DDD, Entity, ValueObject, Enumeration</PackageTags>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <RepositoryUrl>https://github.com/Sunlix-Software/Sunlix.NET.Primitives</RepositoryUrl>
