@@ -5,13 +5,13 @@
   </ItemGroup>
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.1</TargetFramework>
+    <TargetFramework>net6.0;net8.0;net9.0</TargetFramework>
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <PropertyGroup>
     <PackageId>Sunlix.NET.Primitives</PackageId>
-    <Version>1.0.1</Version>
+    <Version>1.0.2</Version>
     <Authors>Igor Bzovsky</Authors>
     <Company>Sunlix</Company>
     <Description>Sunlix.NET.Primitives is a lightweight library providing fundamental types for object-oriented programming and domain-driven design (DDD), including Entity, ValueObject, and Enumeration.</Description>
