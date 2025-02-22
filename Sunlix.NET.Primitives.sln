@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sunlix.NET.Primitives", "sr
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sunlix.NET.Primitives.Tests", "tests\Sunlix.NET.Primitives.Tests\Sunlix.NET.Primitives.Tests.csproj", "{E87C54C4-EA34-449E-99C3-C0B8F5C093D0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sunlix.NET.Primitives.Serialization.Json", "src\Sunlix.NET.Primitives.Serialization.Json\Sunlix.NET.Primitives.Serialization.Json.csproj", "{885F8EC2-CDA2-4EBD-BE17-04DD8C91E105}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -25,6 +27,10 @@ Global
 		{E87C54C4-EA34-449E-99C3-C0B8F5C093D0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E87C54C4-EA34-449E-99C3-C0B8F5C093D0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E87C54C4-EA34-449E-99C3-C0B8F5C093D0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{885F8EC2-CDA2-4EBD-BE17-04DD8C91E105}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{885F8EC2-CDA2-4EBD-BE17-04DD8C91E105}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{885F8EC2-CDA2-4EBD-BE17-04DD8C91E105}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{885F8EC2-CDA2-4EBD-BE17-04DD8C91E105}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -32,6 +38,7 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{A3F6FD3B-319A-4563-AEF7-9953BF8CBAAD} = {D677EF68-4058-403A-B665-69E16540F12D}
 		{E87C54C4-EA34-449E-99C3-C0B8F5C093D0} = {724331BE-E215-4809-909A-BA3A142F0D16}
+		{885F8EC2-CDA2-4EBD-BE17-04DD8C91E105} = {D677EF68-4058-403A-B665-69E16540F12D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {612D341E-ADC3-4446-B909-65197CC22933}
