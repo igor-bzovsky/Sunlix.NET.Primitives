@@ -66,7 +66,7 @@ namespace Sunlix.NET.Primitives
             return EnumerationNames.TryGetValue(name, out enumeration);
         }
 
-        public static bool Exists(int value) 
+        public static bool Exists(int value)
             => EnumerationValues.ContainsKey(value);
 
         public static bool Exists(string name)
