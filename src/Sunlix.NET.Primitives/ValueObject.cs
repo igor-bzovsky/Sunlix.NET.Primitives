@@ -8,37 +8,34 @@ namespace Sunlix.NET.Primitives
     {
         public bool Equals(ValueObject? other)
         {
-            if (ReferenceEquals(null, other)) return false;
+            if (other is null) return false;
             if (ReferenceEquals(this, other)) return true;
-            return EqualsCore(other);
+            if (other.GetType() != GetType()) return false;
+            return SatisfiesStructuralEquality(other);
         }
 
         public override bool Equals(object? obj)
-        {
-            if (ReferenceEquals(null, obj)) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
-            return EqualsCore((ValueObject)obj);
-        }
+            => obj is ValueObject other && Equals(other);
 
         public override int GetHashCode()
         {
             return GetEqualityComponents()
-                .Select(x => x != null ? x.GetHashCode() : 0)
-                .Aggregate((x, y) => x ^ y);
+                .Aggregate(new HashCode(), (hash, component) =>
+                {
+                    hash.Add(component);
+                    return hash;
+                }).ToHashCode();
         }
 
         public static bool operator ==(ValueObject? left, ValueObject? right)
-        {
-            if (ReferenceEquals(left, null) ^ ReferenceEquals(right, null)) return false;
-            return ReferenceEquals(left, null) || left.Equals(right);
-        }
+            => left is null ? right is null : left.Equals(right);
 
-        public static bool operator !=(ValueObject? left, ValueObject? right) => !(left == right);
+        public static bool operator !=(ValueObject? left, ValueObject? right)
+            => !(left == right);
 
         protected abstract IEnumerable<object> GetEqualityComponents();
 
-        private bool EqualsCore(ValueObject other) => this.GetEqualityComponents()
-            .SequenceEqual(other.GetEqualityComponents());
+        private bool SatisfiesStructuralEquality(ValueObject other)
+            => GetEqualityComponents().SequenceEqual(other.GetEqualityComponents());
     }
 }

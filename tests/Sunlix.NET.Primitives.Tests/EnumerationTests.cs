@@ -2,108 +2,108 @@
 {
     public class EnumerationTests
     {
-        const int MaxNameLength = 256;
+        const int MaxNameLength = 255;
 
         #region Constructor
         [Fact]
-        public void Constructor_throws_exception_if_value_is_negative()
+        public void Constructor_should_throw_exception_when_value_is_negative()
         {
-            Action sut = () => new OrderStatus(-1, "Test name");
+            Action act = () => new OrderStatus(-1, "Test name");
 
-            sut.Should().Throw<ArgumentException>()
-                .WithMessage("Value '-1' is invalid. Enumeration: OrderStatus");
+            act.Should().Throw<ArgumentException>()
+                .WithMessage("Invalid enumeration value: '-1'. Expected a positive value. (Parameter 'value')");
         }
 
         [Theory]
         [MemberData(nameof(GetNullOrWhiteSpaceNames))]
-        public void Constructor_throws_exception_if_name_is_null_or_whitespace(string? name)
+        public void Constructor_should_throw_exception_when_name_is_null_or_whitespace(string? name)
         {
             Action act = () => new OrderStatus(0, name!);
 
             act.Should().Throw<ArgumentException>()
-                .WithMessage("Name should not be null or empty. Enumeration: OrderStatus");
+                .WithMessage("Enumeration name cannot be null, empty, or contain only whitespace. (Parameter 'name')");
         }
 
         [Fact]
-        public void Constructor_throws_exception_if_name_length_exceeds_max_length()
+        public void Constructor_should_throw_exception_when_name_length_exceeds_maximum()
         {
-            Action act = () => new OrderStatus(0, new string('A', MaxNameLength));
+            Action act = () => new OrderStatus(0, new string('A', MaxNameLength + 1));
 
             act.Should().Throw<ArgumentException>()
-                .WithMessage("Name 'AAAAAAAAAAAAAAAAAAAA...' length exceeds maximum length. Enumeration: OrderStatus");
+                .WithMessage($"Enumeration name 'AAAAAAAAAAAAAAAAAAAA...' exceeds the maximum allowed length of {MaxNameLength} characters. (Parameter 'name')");
         }
         #endregion
 
         #region Initialization, GetAll, Exists
         [Fact]
-        public void Enumeration_initializes_correctly()
+        public void Enumeration_should_initialize_correctly()
         {
-            var status = OrderStatus.Pending;
+            var sut = OrderStatus.Pending;
 
-            status.Value.Should().Be(1);
-            status.Name.Should().Be("Pending");
+            sut.Value.Should().Be(1);
+            sut.Name.Should().Be("Pending");
         }
 
         [Fact]
-        public void Enumeration_throws_exception_if_duplicate_value_exists()
+        public void GetAll_should_throw_exception_when_duplicate_value_exists()
         {
             Action act = () => OrderStatusWithDuplicateValue.GetAll();
 
             act.Should().Throw<InvalidOperationException>()
-                .WithMessage("Duplicate value detected. Enumeration: OrderStatusWithDuplicateValue. Value: 1");
+                .WithMessage("Duplicate enumeration value detected: '1'. Value must be unique.");
         }
 
         [Fact]
-        public void Enumeration_throws_exception_if_duplicate_name_exists()
+        public void GetAll_should_throw_exception_when_duplicate_name_exists()
         {
             Action act = () => OrderStatusWithDuplicateName.GetAll();
 
             act.Should().Throw<InvalidOperationException>()
-                .WithMessage("Duplicate name detected. Enumeration: OrderStatusWithDuplicateName. Name: 'Pending'");
+                .WithMessage("Duplicate enumeration name detected: 'Pending'. Name must be unique.");
         }
 
         [Fact]
-        public void GetAll_returns_all_defined_enumerations()
+        public void GetAll_should_return_all_defined_enumerations()
         {
-            var allStatuses = Enumeration<OrderStatus>.GetAll();
+            var result = Enumeration<OrderStatus>.GetAll();
 
-            allStatuses.Should().Contain(new[] { OrderStatus.Pending, OrderStatus.Shipped });
-            allStatuses.Should().HaveCount(2);
+            result.Should().Contain([OrderStatus.Pending, OrderStatus.Shipped]);
+            result.Should().HaveCount(2);
         }
 
         [Fact]
-        public void Exists_returns_true_if_value_exists()
+        public void Exists_should_return_true_when_value_exists()
         {
-            bool result = Enumeration<OrderStatus>.Exists(1);
+            var result = Enumeration<OrderStatus>.Exists(1);
             result.Should().BeTrue();
         }
 
         [Fact]
-        public void Exists_returns_true_if_value_does_not_exist()
+        public void Exists_should_return_false_when_value_does_not_exist()
         {
-            bool result = Enumeration<OrderStatus>.Exists(-1);
+            var result = Enumeration<OrderStatus>.Exists(-1);
             result.Should().BeFalse();
         }
 
         [Fact]
-        public void Exists_returns_true_if_name_exists()
+        public void Exists_should_return_true_when_name_exists()
         {
-            bool result = Enumeration<OrderStatus>.Exists("Pending");
+            var result = Enumeration<OrderStatus>.Exists("Pending");
             result.Should().BeTrue();
         }
 
         [Fact]
-        public void Exists_returns_true_if_name_does_not_exist()
+        public void Exists_should_return_false_when_name_does_not_exist()
         {
-            bool result = Enumeration<OrderStatus>.Exists("Delivered");
+            var result = Enumeration<OrderStatus>.Exists("Delivered");
             result.Should().BeFalse();
         }
 
         [Theory]
         [MemberData(nameof(GetNullOrWhiteSpaceNames))]
-        public void Exists_returns_false_if_name_is_null_or_whitespace(string? name)
+        public void Exists_should_return_false_when_name_is_null_or_whitespace(string? name)
         {
-            bool result = Enumeration<OrderStatus>.Exists(name!);
+            var result = Enumeration<OrderStatus>.Exists(name!);
             result.Should().BeFalse();
         }
         #endregion
@@ -111,131 +111,129 @@
         #region Get enumeration by value
         [Theory]
         [MemberData(nameof(GetValueOrderStatusTuples))]
-        public void FromValue_returns_correct_enumeration(int value, OrderStatus orderStatus)
+        public void FromValue_should_return_correct_enumeration(int value, OrderStatus expextedResult)
         {
-            var status = Enumeration<OrderStatus>.FromValue(value);
-
-            status.Should().Be(orderStatus);
+            var result = Enumeration<OrderStatus>.FromValue(value);
+            result.Should().Be(expextedResult);
         }
 
         [Fact]
-        public void FromValue_throws_exception_if_value_is_not_found()
+        public void FromValue_should_throw_exception_when_value_is_not_found()
         {
             Action act = () => Enumeration<OrderStatus>.FromValue(999);
 
             act.Should().Throw<InvalidOperationException>()
-                .WithMessage("Value '999' is invalid. Enumeration: OrderStatus");
+                .WithMessage("Enumeration value '999' was not found. Ensure it exists before accessing.");
         }
 
         [Fact]
-        public void FromValue_throws_exception_if_value_is_invalid()
+        public void FromValue_should_throw_exception_when_value_is_invalid()
         {
             Action act = () => Enumeration<OrderStatus>.FromValue(-1);
 
             act.Should().Throw<ArgumentException>()
-                .WithMessage("Value '-1' is invalid. Enumeration: OrderStatus");
+                .WithMessage("Invalid enumeration value: '-1'. Expected a positive value. (Parameter 'value')");
         }
 
         [Theory]
         [MemberData(nameof(GetValueOrderStatusTuples))]
-        public void TryGetFromValue_sets_correct_enumeration(int value, OrderStatus orderStatus)
+        public void TryGetFromValue_should_set_correct_enumeration(int value, OrderStatus expectedEnumeration)
         {
-            bool result = Enumeration<OrderStatus>.TryGetFromValue(value, out var status);
+            bool result = Enumeration<OrderStatus>.TryGetFromValue(value, out var enumeration);
 
             result.Should().BeTrue();
-            status.Should().Be(orderStatus);
+            enumeration.Should().Be(expectedEnumeration);
         }
 
         [Fact]
-        public void TryGetFromValue_sets_null_if_value_is_not_found()
+        public void TryGetFromValue_should_return_false_and_set_null_when_value_is_not_found()
         {
-            bool result = Enumeration<OrderStatus>.TryGetFromValue(999, out var status);
+            bool result = Enumeration<OrderStatus>.TryGetFromValue(999, out var enumeration);
 
             result.Should().BeFalse();
-            status.Should().BeNull();
+            enumeration.Should().BeNull();
         }
 
         [Fact]
-        public void TryGetFromValue_sets_null_if_value_is_invalid()
+        public void TryGetFromValue_should_return_false_and_set_null_when_value_is_invalid()
         {
-            bool result = Enumeration<OrderStatus>.TryGetFromValue(-1, out var status);
+            bool result = Enumeration<OrderStatus>.TryGetFromValue(-1, out var enumeration);
 
             result.Should().BeFalse();
-            status.Should().BeNull();
+            enumeration.Should().BeNull();
         }
         #endregion
 
         #region Get enumeration by name
         [Theory]
         [MemberData(nameof(GetNameOrderStatusTuples))]
-        public void FromName_returns_correct_enumeration(string name, OrderStatus orderStatus)
+        public void FromName_should_return_correct_enumeration(string name, OrderStatus expectedEnumeration)
         {
-            var status = Enumeration<OrderStatus>.FromName(name);
-
-            status.Should().Be(orderStatus);
+            var enumeration = Enumeration<OrderStatus>.FromName(name);
+            enumeration.Should().Be(expectedEnumeration);
         }
 
         [Fact]
-        public void FromName_throws_exception_if_name_is_not_found()
+        public void FromName_should_throw_exception_when_name_is_not_found()
         {
             Action act = () => Enumeration<OrderStatus>.FromName("Created");
 
             act.Should().Throw<InvalidOperationException>()
-                .WithMessage("Name 'Created' is invalid. Enumeration: OrderStatus");
+                .WithMessage("Enumeration name 'Created' was not found. Ensure it exists before accessing.");
         }
 
         [Theory]
         [MemberData(nameof(GetNullOrWhiteSpaceNames))]
-        public void FromName_throws_exception_if_name_is_null_or_whitespace(string? name)
+        public void FromName_should_throw_exception_when_name_is_null_or_whitespace(string? name)
         {
             Action act = () => Enumeration<OrderStatus>.FromName(name!);
 
             act.Should().Throw<ArgumentException>()
-                .WithMessage("Name should not be null or empty. Enumeration: OrderStatus");
+                .WithMessage("Enumeration name cannot be null, empty, or contain only whitespace. (Parameter 'name')");
         }
 
         [Theory]
         [MemberData(nameof(GetNameOrderStatusTuples))]
-        public void TryGetFromName_sets_correct_enumeration(string name, OrderStatus orderStatus)
+        public void TryGetFromName_should_set_correct_enumeration(string name, OrderStatus expectedEnumeration)
         {
-            bool result = Enumeration<OrderStatus>.TryGetFromName(name, out var status);
+            bool result = Enumeration<OrderStatus>.TryGetFromName(name, out var enumeration);
 
             result.Should().BeTrue();
-            status.Should().Be(orderStatus);
+            enumeration.Should().Be(expectedEnumeration);
         }
 
         [Fact]
-        public void TryGetFromName_sets_null_if_not_found()
+        public void TryGetFromName_should_return_false_and_set_null_when_name_is_not_found()
         {
-            bool result = Enumeration<OrderStatus>.TryGetFromName("Created", out var status);
+            bool result = Enumeration<OrderStatus>.TryGetFromName("Created", out var enumeration);
 
             result.Should().BeFalse();
-            status.Should().BeNull();
+            enumeration.Should().BeNull();
         }
 
         [Theory]
         [MemberData(nameof(GetNullOrWhiteSpaceNames))]
-        public void TryGetFromName_sets_null_if_name_is_null_or_whitespace(string? name)
+        public void TryGetFromName_should_return_false_and_set_null_when_name_is_null_or_whitespace(string? name)
         {
-            bool result = Enumeration<OrderStatus>.TryGetFromName(name!, out var status);
+            bool result = Enumeration<OrderStatus>.TryGetFromName(name!, out var enumeration);
 
             result.Should().BeFalse();
-            status.Should().BeNull();
+            enumeration.Should().BeNull();
         }
 
         [Fact]
-        public void TryGetFromName_sets_null_if_name_length_exceeds_max_length()
+        public void TryGetFromName_should_return_false_and_set_null_when_name_length_exceeds_maximum()
         {
-            bool result = Enumeration<OrderStatus>.TryGetFromName(new string('A', MaxNameLength), out var status);
+            bool result = Enumeration<OrderStatus>.TryGetFromName(new string('A', MaxNameLength), out var enumeration);
 
             result.Should().BeFalse();
-            status.Should().BeNull();
+            enumeration.Should().BeNull();
         }
         #endregion
 
         #region Equality
         [Fact]
-        public void Enumerations_with_equal_references_should_be_equal()
+        public void Enumeration_should_be_equal_to_same_instance()
         {
             OrderStatus.Pending
                 .Equals(OrderStatus.Pending)
@@ -243,7 +241,7 @@
         }
 
         [Fact]
-        public void Enumerations_with_same_type_and_value_should_be_equal()
+        public void Enumeration_should_be_equal_to_instance_with_same_type_and_value()
         {
             OrderStatus.Pending
                 .Equals(new OrderStatus(1, "Pending"))
@@ -251,7 +249,7 @@
         }
 
         [Fact]
-        public void Enumerations_with_different_values_should_not_be_equal()
+        public void Enumeration_should_not_be_equal_to_instance_with_different_value()
         {
             OrderStatus.Pending
                 .Equals(new OrderStatus(2, "Pending"))
@@ -259,16 +257,15 @@
         }
 
         [Fact]
-        public void Equals_null_returns_false()
+        public void Enumeration_should_not_be_equal_to_null()
         {
-            OrderStatus nullStatus = null!;
             OrderStatus.Pending
-                .Equals(nullStatus)
+                .Equals(null)
                 .Should().BeFalse();
         }
 
         [Fact]
-        public void Enumeration_and_object_with_equal_references_should_be_equal()
+        public void Enumeration_should_be_equal_to_same_instance_as_object()
         {
             OrderStatus.Pending
                 .Equals((object)OrderStatus.Pending)
@@ -276,7 +273,7 @@
         }
 
         [Fact]
-        public void Enumeration_and_object_with_same_type_and_value_should_be_equal()
+        public void Enumeration_should_be_equal_to_object_with_same_type_and_value()
         {
             OrderStatus.Pending
                 .Equals((object)(new OrderStatus(1, "Pending")))
@@ -284,7 +281,7 @@
         }
 
         [Fact]
-        public void Enumeration_and_object_with_different_values_should_not_be_equal()
+        public void Enumeration_should_not_be_equal_to_object_with_different_value()
         {
             OrderStatus.Pending
                 .Equals((object)(new OrderStatus(2, "Pending")))
@@ -292,7 +289,7 @@
         }
 
         [Fact]
-        public void Enumerations_with_different_types_should_not_be_equal()
+        public void Enumeration_should_not_be_equal_to_different_enumeration_type()
         {
             OrderStatus.Pending
                 .Equals(new InvoiceStatus(1, "Pending"))
@@ -300,44 +297,45 @@
         }
 
         [Fact]
-        public void Equals_object_null_returns_false()
+        public void Enumeration_should_not_be_equal_to_null_object()
         {
-            object nullStatus = null!;
             OrderStatus.Pending
-                .Equals(nullStatus)
+                .Equals((object?)null)
                 .Should().BeFalse();
         }
 
         [Fact]
-        public void Operator_Equals_returns_true_for_different_instances_with_same_value()
+        public void Equality_operator_should_return_true_for_instances_with_same_value()
         {
             (OrderStatus.Pending == new OrderStatus(1, "Pending"))
                 .Should().BeTrue();
         }
+        #endregion
 
+        #region Operators
         [Fact]
-        public void Operator_NotEquals_returns_false_for_different_instances_with_same_value()
+        public void Inequality_operator_should_return_false_for_instances_with_same_value()
         {
             (OrderStatus.Pending != new OrderStatus(1, "Pending"))
                 .Should().BeFalse();
         }
 
         [Fact]
-        public void Operator_Equals_returns_false_for_different_values()
+        public void Equality_operator_should_return_false_for_instances_with_different_values()
         {
             (OrderStatus.Pending == OrderStatus.Shipped)
                 .Should().BeFalse();
         }
 
         [Fact]
-        public void Operator_NotEquals_returns_true_for_different_values()
+        public void Inequality_operator_should_return_true_for_instances_with_different_values()
         {
             (OrderStatus.Pending != OrderStatus.Shipped)
                 .Should().BeTrue();
         }
 
         [Fact]
-        public void Operator_Equals_returns_true_if_both_operands_are_null()
+        public void Equality_operator_should_return_true_when_both_operands_are_null()
         {
             OrderStatus left = null!;
             OrderStatus right = null!;
@@ -345,7 +343,7 @@
         }
 
         [Fact]
-        public void Operator_NotEquals_returns_false_if_both_operands_are_null()
+        public void Inequality_operator_should_return_false_when_both_operands_are_null()
         {
             OrderStatus left = null!;
             OrderStatus right = null!;
@@ -353,7 +351,7 @@
         }
 
         [Fact]
-        public void Operator_Equals_returns_false_if_one_operand_is_null()
+        public void Equality_operator_should_return_false_when_one_operand_is_null()
         {
             OrderStatus? left = null!;
             (left == OrderStatus.Pending).Should().BeFalse();
@@ -361,7 +359,7 @@
         }
 
         [Fact]
-        public void Operator_NotEquals_returns_true_if_one_operand_is_null()
+        public void Inequality_operator_should_return_true_when_one_operand_is_null()
         {
             OrderStatus? left = null!;
             (left != OrderStatus.Pending).Should().BeTrue();
@@ -369,9 +367,9 @@
         }
         #endregion
 
-        #region Hash code
+        #region GetHashCode
         [Fact]
-        public void Enumerations_with_same_values_should_have_same_hash_code()
+        public void Enumerations_with_same_value_should_have_same_hash_code()
         {
             OrderStatus.Pending.GetHashCode()
                 .Should().Be(new OrderStatus(1, "Pending")
@@ -385,11 +383,21 @@
                 .Should().NotBe(new OrderStatus(2, "Pending")
                 .GetHashCode());
         }
+
+        [Fact]
+        public void GetHashCode_should_return_consistent_value()
+        {
+            var sut = OrderStatus.Pending;
+            var hash1 = sut.GetHashCode();
+            var hash2 = sut.GetHashCode();
+
+            hash1.Should().Be(hash2);
+        }
         #endregion
 
         #region Compare
         [Fact]
-        public void CompareTo_same_value_returns_zero()
+        public void CompareTo_should_return_zero_when_values_are_equal()
         {
             OrderStatus.Pending
                 .CompareTo(new OrderStatus(1, "Pending"))
@@ -397,7 +405,7 @@
         }
 
         [Fact]
-        public void CompareTo_lower_value_returns_negative()
+        public void CompareTo_should_return_negative_when_compared_to_higher_value()
         {
             OrderStatus.Pending
                 .CompareTo(OrderStatus.Shipped)
@@ -405,7 +413,7 @@
         }
 
         [Fact]
-        public void CompareTo_higher_value_returns_positive()
+        public void CompareTo_should_return_positive_when_compared_to_lower_value()
         {
             OrderStatus.Shipped
                 .CompareTo(OrderStatus.Pending)
@@ -413,13 +421,80 @@
         }
 
         [Fact]
-        public void CompareTo_null_returns_positive()
+        public void CompareTo_should_return_positive_when_other_is_null()
         {
+            OrderStatus? nullEnumeration = null;
             OrderStatus.Pending
-                .CompareTo(null)
+                .CompareTo(nullEnumeration)
                 .Should().BePositive();
         }
+
+        [Fact]
+        public void CompareTo_object_should_return_zero_when_values_are_equal()
+        {
+            OrderStatus.Pending
+                .CompareTo((object)(new OrderStatus(1, "Pending")))
+                .Should().Be(0);
+        }
+
+        [Fact]
+        public void CompareTo_object_should_return_negative_when_compared_to_higher_value()
+        {
+            OrderStatus.Pending
+                .CompareTo((object)OrderStatus.Shipped)
+                .Should().BeNegative();
+        }
+
+        [Fact]
+        public void CompareTo_object_should_return_positive_when_compared_to_lower_value()
+        {
+            OrderStatus.Shipped
+                .CompareTo((object)OrderStatus.Pending)
+                .Should().BePositive();
+        }
+
+        [Fact]
+        public void CompareTo_object_should_return_positive_when_other_is_null()
+        {
+            object? nullEnumeration = null;
+            OrderStatus.Pending
+                .CompareTo(nullEnumeration)
+                .Should().BePositive();
+        }
+
+        [Fact]
+        public void CompareTo_object_should_throw_exception_when_compared_to_different_enumeration_type()
+        {
+            var sut = OrderStatus.Pending;
+            var other = InvoiceStatus.Pending;
+
+            Action act = () => sut.CompareTo(other);
+
+            act.Should().Throw<ArgumentException>()
+                .WithMessage("Object type mismatch. Ensure the correct type is used. (Parameter 'obj')");
+        }
+
+        [Fact]
+        public void CompareTo_object_should_throw_exception_when_compared_to_non_enumeration_type()
+        {
+            var sut = OrderStatus.Pending;
+            string other = "Invoice status";
+
+            Action act = () => sut.CompareTo(other);
+
+            act.Should().Throw<ArgumentException>()
+                .WithMessage("Object type mismatch. Ensure the correct type is used. (Parameter 'obj')");
+        }
         #endregion
+
+        [Fact]
+        public void ToString_should_return_enumeration_name()
+        {
+            var sut = OrderStatus.Pending;
+            string result = sut.ToString();
+
+            result.Should().Be(sut.Name);
+        }
 
         public static IEnumerable<object[]> GetNullOrWhiteSpaceNames()
         {
@@ -440,7 +515,6 @@
             yield return new object[] { "Shipped", OrderStatus.Shipped };
         }
 
-
         public class OrderStatus : Enumeration<OrderStatus>
         {
             public static readonly OrderStatus Pending = new OrderStatus(1, nameof(Pending));
@@ -452,6 +526,7 @@
         public class InvoiceStatus : Enumeration<InvoiceStatus>
         {
             public static readonly InvoiceStatus Pending = new InvoiceStatus(1, nameof(Pending));
+            public static readonly InvoiceStatus Shipped = new InvoiceStatus(2, nameof(Shipped));
 
             public InvoiceStatus(int value, string name) : base(value, name) { }
         }
