@@ -208,15 +208,121 @@ public static class Errors
 ```
 
 ## Unit
-**Unit** is a struct representing a `void` return type, commonly used in functional programming.
 
-#### **Example:**
+### Overview
+`Unit` represents a unit type that holds no information. It is commonly used in functional programming as a replacement for `void` when a method needs to return a value but has no meaningful data to return.
+
+### Features
+- Serves as a placeholder return type in functional programming.
+- Provides a single shared instance: `Unit.value`.
+- All instances of `Unit` are considered equal.
+
+### Usage
+#### Basic Example
 ```csharp
-public Task<Unit> SaveChangesAsync()
-{
-    return Task.FromResult(Unit.value);
-}
+Unit unit = Unit.value;
 ```
+
+#### Equality Comparison
+| Expression | Result |
+|------------|--------|
+| `Unit.value == Unit.value` | `true` |
+| `Unit.value.Equals(Unit.value)` | `true` |
+| `Unit.value.Equals(null)` | `false` |
+| `Unit.value.GetHashCode()` | `0` |
+
+### API Reference
+#### Fields
+- `Unit.value` - A single shared instance of the `Unit` type.
+
+#### Methods
+##### `bool Equals(Unit other)`
+Determines whether the specified `Unit` is equal to the current instance.
+- **Returns:** Always `true`.
+
+##### `bool Equals(object obj)`
+Determines whether the specified object is equal to the current `Unit` instance.
+- **Returns:** `true` if the object is an instance of `Unit`, otherwise `false`.
+
+##### `int GetHashCode()`
+Returns a hash code for this instance.
+- **Returns:** Always `0` since all instances of `Unit` are considered equal.
+
+##### `string ToString()`
+Returns a string representation of the `Unit` type.
+- **Returns:** `"()"`.
+
+### Additional Information
+`Unit` is useful in scenarios where an operation must return a value, but no actual data is necessary. This is particularly common in functional programming paradigms.
+
+#### Example
+##### Using `Unit` to Chain Functions
+In functional programming, functions should be composable, meaning their outputs can be used as inputs for other functions. However, functions that return `void` break this pattern because `void` is not a real type and cannot be passed as a value.
+
+Consider the following example:
+
+##### **Incorrect Approach (`void` breaks composition)**
+```csharp
+void LogMessage(string message)
+{
+    Console.WriteLine($"[LOG]: {message}");
+}
+
+void FinalStep()
+{
+    Console.WriteLine("Final step executed.");
+}
+
+void Process(string message)
+{
+    LogMessage(message);
+    FinalStep(); // Simply calling the next function
+}
+
+Process("Starting process");
+```
+
+Here, `LogMessage` does not return a value, and `FinalStep` is called separately. If we needed to pass the result of one function to another, **we could not do that**, because `void` cannot be used as an argument.
+
+##### **Correct Approach (`Unit` enables composition)**
+```csharp
+Func<string, Unit> logMessage = message =>
+{
+    Console.WriteLine($"[LOG]: {message}");
+    return Unit.value;
+};
+
+Func<Unit, Unit> finalStep = _ =>
+{
+    Console.WriteLine("Final step executed.");
+    return Unit.value;
+};
+
+// Functional composition: the result of logMessage is passed to finalStep
+Func<string, Unit> process = message => finalStep(logMessage(message));
+
+process("Starting process");
+```
+
+#### Why `void` Doesn't Work?
+1. **`void` cannot be passed to another function**  
+   - `void` is not a value, but rather the absence of a value, so it cannot be used in composition.
+   - `Unit`, on the other hand, is a concrete value that can be passed around.
+
+2. **Cannot be used in generic (`generic`) functions**  
+   - For example, `Func<T, void>` does not exist, but `Func<T, Unit>` is a valid function signature.
+
+3. **Breaks functional style**  
+   - In functional programming, every function should **return a value**, even if it carries no information.
+   - `void` violates this principle, while `Unit` maintains it.
+
+#### Key Benefits
+- **Allows function composition:** `Unit` enables treating all functions as first-class, even those that conceptually return `void`.
+- **Prevents special cases:** Avoids needing separate handling for `void` methods in functional pipelines.
+- **Supports generic programming:** Can be used as a return type in generics where `void` is not allowed.
+
+By using `Unit`, we ensure consistency in functional programming patterns while enabling better function composition and reuse.
+
 
 ---
 
