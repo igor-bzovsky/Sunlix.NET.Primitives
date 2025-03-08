@@ -1,5 +1,8 @@
 # Sunlix.NET.Primitives
-![Favicon (128 x 128)](https://github.com/user-attachments/assets/5a06a848-9786-4119-8a0a-3dd950039253)
+![Banner3](https://github.com/user-attachments/assets/fffbb2fb-e940-4151-bd75-0f8964038ddd)
+
+
+
 
 [![.NET](https://img.shields.io/badge/.NET-6.0%20%7C%208.0%20%7C%209.0-blue)](https://dotnet.microsoft.com/en-us/)
 [![NuGet](https://img.shields.io/nuget/v/Sunlix.NET.Primitives.svg)](https://www.nuget.org/packages/Sunlix.NET.Primitives/)
@@ -28,7 +31,17 @@ The library has no external dependencies and can be used in any .NET application
 ## Overview of Core Concepts
 
 ### Entity
-An **Entity** represents an object with a distinct identity that persists over time. Entities are compared based on their identifier rather than their attributes. Entities let you track objects—like customers, orders, or products—over time, ensuring continuity even as their details evolve.
+An **Entity** represents an object with a distinct and persistent identity, uniquely identified by an identifier rather than its attributes. Entities are designed to model domain concepts that require continuity over time, ensuring that their identity remains stable despite changes to their attributes.
+
+**🔹 Purpose:** Entities enable the tracking and management of domain objects with unique identities, such as users, orders, or products, within the context of a domain model.
+
+**🔹 Key Characteristics:** Identity-based equality, persistence, and mutability of attributes (while preserving the identifier).
+
+### Aggregate Root
+An **Aggregate Root** is an Entity that serves as the gateway to a cluster of related objects, known as an aggregate. It enforces consistency rules and coordinates changes, ensuring the integrity of the entire group in line with domain-driven design (DDD) principles.
+
+- **Purpose:** Aggregate Roots ensure consistency and enforce domain rules within a bounded context, serving as the entry point for operations that involve multiple related objects.
+- **Key Characteristics:** Single point of access, enforcement of invariants, and coordination of updates within the aggregate.
 
 ---
 
