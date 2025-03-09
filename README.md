@@ -1,5 +1,6 @@
 # Sunlix.NET.Primitives
-![Banner3](https://github.com/user-attachments/assets/fffbb2fb-e940-4151-bd75-0f8964038ddd)
+![Banner (1200 x 150 px )](https://github.com/user-attachments/assets/f2db232b-48e2-420c-9046-05561935c1ad)
+
 
 
 
