@@ -1,9 +1,5 @@
 # Sunlix.NET.Primitives
-![Sunlix NET Primitives (1200 x 150 px )](https://github.com/user-attachments/assets/3f89d51d-633e-468e-843a-58526157ba02)
-
-
-
-
+![Sunlix NET Primitives (1200 x 150 px )](https://github.com/user-attachments/assets/d520db6f-7934-4222-8da0-88cc5b5077ec)
 
 [![.NET](https://img.shields.io/badge/.NET-6.0%20%7C%208.0%20%7C%209.0-blue)](https://dotnet.microsoft.com/en-us/)
 [![NuGet](https://img.shields.io/nuget/v/Sunlix.NET.Primitives.svg)](https://www.nuget.org/packages/Sunlix.NET.Primitives/)
