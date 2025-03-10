@@ -9,20 +9,24 @@
 
 **Sunlix.NET.Primitives** is a lightweight library providing a set of key types for structured domain modeling in C#. It includes core abstractions such as *Entity*, *Value Object*, *Aggregate Root*, and *Domain Events*, essential for implementing domain-driven design (DDD) principles. Additionally, it provides *Enumeration* for defining strongly-typed sets of named values and *Error* for structured error handling. The library is designed to be extensible, intuitive, and efficient, making it suitable for a wide range of applications where well-structured domain models are needed.
 
-## Contents
+# Contents
 - [Installation](#installation)
 - [Overview of Core Concepts](#overview-of-core-concepts)
 - [Usage](#usage)
-  - [Entity](#entity)
+  - [Entity&lt;TId&gt;](#entitytid)
+    - [Equality Rules](#equality-rules)
+    - [Comparison Rules](#comparison-rules)
+  - [AggregateRoot](#aggregateroot)
+  - [IDomainEvent](#idomainevent)
 
-## Installation
-#### NuGet Package  
+# Installation
+### NuGet Package  
 The package is available on NuGet. You can install it using the following command:
 
 ```sh
 dotnet add package Sunlix.NET.Primitives
 ```
-#### Installing from Source (GitHub)  
+### Installing from Source (GitHub)  
 If you prefer to install the library directly from the source code, you can clone the repository and reference the project in your solution:
 
 ```sh
@@ -34,23 +38,23 @@ Then, add a project reference in your .csproj file:
     <ProjectReference Include="..\Sunlix.NET.Primitives\src\Sunlix.NET.Primitives.csproj" />
 </ItemGroup>
 ```
-#### Minimum Requirements  
+### Minimum Requirements  
 Compatible with **.NET 6**, **.NET 8**, and **.NET 9**.  
 The library has no external dependencies and can be used in any .NET application.
 
-##  Overview of Core Concepts
+#  Overview of Core Concepts
 
 
-##  Usage
+#  Usage
 This section covers the fundamental base classes and structures used in Sunlix.NET.Primitives, along with usage examples and important implementation nuances.
 
-### Entity
+## Entity&lt;TId&gt;
 An **Entity** represents an object with a distinct and persistent identity, uniquely identified by an identifier rather than its attributes. Entities are designed to model domain concepts that require continuity over time, ensuring that their identity remains stable despite changes to their attributes. Entities enable the tracking and management of domain objects with unique identities, such as users, orders, or products, within the context of a domain model.
 
-#### 🔑 Key Characteristics
-🔹 **Identity-based equality** – Two entities are equal if they share the same `Id`.  
-🔹 **Persistence** – Entity identity remains constant throughout its lifecycle.  
-🔹 **Mutable attributes** – The values of an entity's attributes may change, but its identity does not.
+**🔑 Key Characteristics:**
+- **Identity-based equality** – Two entities are equal if they have the same identifier.  
+- **Persistence** – Entity identity remains constant throughout its lifecycle.  
+- **Mutable attributes** – The values of an entity's attributes may change, but its identity does not.
 
 **📝 Example:**
 ```csharp
@@ -72,23 +76,27 @@ public class Order : Entity<int>
     }
 }
 ```
-> **📄 Note:** *The `Entity<TId>` class includes a parameterless protected constructor and a virtual `Id` property to support compatibility with Object-Relational Mappers (ORMs) like NHibernate, which require a [parameterless constructor](https://nhibernate.info/doc/nhibernate-reference/persistent-classes.html#persistent-classes-poco-constructor) for entity instantiation. Although Entity Framework Core supports [parameterized constructors](https://learn.microsoft.com/en-us/ef/core/modeling/constructors), it still requires navigation properties to be virtual to enable [proxy-based lazy loading](https://learn.microsoft.com/en-us/ef/core/querying/related-data/lazy).*
+> **📄 Note:** *The `Entity<TId>` class includes a parameterless protected constructor and a virtual `Id` property to support compatibility with Object-Relational Mappers (ORMs) like NHibernate, which [require a parameterless constructor](https://nhibernate.info/doc/nhibernate-reference/persistent-classes.html#persistent-classes-poco-constructor) for entity instantiation. Although Entity Framework Core [supports parameterized constructors](https://learn.microsoft.com/en-us/ef/core/modeling/constructors), it still requires navigation properties to be virtual to enable [proxy-based lazy loading](https://learn.microsoft.com/en-us/ef/core/querying/related-data/lazy).*
 >
 > *This design choice introduces a trade-off where persistence concerns slightly leak into the domain model, but it enables seamless integration with the ORM frameworks.* 
 
-#### ⚖️ Equality Rules
-Entities follow identifier equality rather than structural equality.
+### Equality Rules
+Entities follow identifier equality rather than structural equality, this means that two entities are considered equal if their IDs are equal.
 
-| Scenario | Explanation | Result |
-|----------|-------------|----------------------------|
-| Same object reference | *Both variables point to the same object in memory, so they are inherently equal.* | ✅ |
-| Same type, same Id | *Entities of the same type with matching Id values are considered equal, regardless of attributes.* | ✅ |
-| Same type, different Id | *Entities of the same type but with different Id values are not equal.* | ❌ |
-| Different type | *Entities must be of the same type to be considered equal, even if their Id values match.* | ❌ |
-| Other entity is null | *An Entity cannot be equal to null; equals returns false for null comparisons.* | ❌ |
-| Default Id (null or default(TId)) | *Entities with default Id values (e.g., null or 0) are not considered equal, as default Id typically indicates an uninitialized state.* | ❌ |
+| Scenario                                      | Explanation                                                                                                                               | Result        |
+|-----------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------|---------------|
+| Same object reference                         | *Both variables point to the same object in memory, so they are inherently equal.*                                                        |✅&nbsp;True  |
+| Same type, same Id                            | *Entities of the same type with matching Id values are considered equal, regardless of attributes.*                                       |✅&nbsp;True  |
+| Same type, have different Id values           | *Entities of the same type but with different Id values are not equal.*                                                                   |❌&nbsp;False |
+| Same type, other Id is null or default        | *Entity with a valid Id is not considered equal to the entity with a default Id (e.g., null or 0).*                                       |❌&nbsp;False |
+| Same type, both Id values are null or default | *Entities with default Id values (e.g., null or 0) are not considered equal, as a default Id typically indicates an uninitialized state.* |❌&nbsp;False |
+| Different runtime types                       | *Entities must be of the same type to be considered equal, even if their Id values match.*                                                |❌&nbsp;False |
+| Other entity is null                          | *An Entity cannot be equal to null; equals returns false for null comparisons.*                                                           |❌&nbsp;False |
+| Both entities are null                        | *Equality operator `==` return true when both entities are null*                                                                          |✅&nbsp;True  |
 
-> **⚠️ Warning:** *if one entity inherits from another and they share the same Id, they will still not be considered equal.*
+
+> **⚠️ Warning:** *if one entity inherits from another and they have the same Id, they will still not be considered equal.*
+
 **📝 Example:**
 ```csharp
 // Same object reference
@@ -116,11 +124,90 @@ var order1 = new Order(id: 1, totalAmount: new Money(10, "USD"));
 Order order2 = null;
 order1.Equals(order2);                                                        // ❌ False
 
-// Default Id (null or default(TId))
+// Same type, one has null or default Id
+var order1 = new Order(id: 1, totalAmount: new Money(10, "USD"));
+var order2 = new Order();
+order1.Equals(order2);                                                        // ❌ False
+
+// Same type, both have null or default Id
 var order1 = new Order();
 var order2 = new Order();
 order1.Equals(order2);                                                        // ❌ False
 ```
+**🛠 Key Aspects of Implementation:**
+- Implements `IEquatable<Entity<TId>` interface to improve type safety and performance (*by allowing generic collections to call `Equals(Entity<TId>)` directly, avoiding the overhead of virtual method calls through `Equals(object)`*).  
+- Overridden `Equals(object)` method delegates to `Equals(Entity<TId>)`, ensuring consistent results.
+- The `==` and `!=` operators are overloaded to align with `Equals` methods, ensuring that entity comparisons behave consistently across different usage contexts.
+- Overridden `GetHashCode()` method calculates the hash code based on the runtime type (*using `GetType()`*) and `Id` and is consistent with `Equals` methods and the equality operator.  
+- Strict type checking (*using `GetType()`*) ensures that entities of different types, even within the same inheritance hierarchy, are never considered equal, preventing logical inconsistencies in equality operations.  
+- Respects all equality rules (*reflexivity*, *symmetry*, *transitivity*, *consistency*, *null handling*).  
+
+**📖 References:**
+- **Microsoft Docs**: [IEquatable&lt;T&gt; Interface](https://learn.microsoft.com/en-us/dotnet/api/system.iequatable-1?view=net-9.0)  
+- **Microsoft Docs**: [How to define value equality for a class or struct](https://learn.microsoft.com/en-us/dotnet/csharp/programming-guide/statements-expressions-operators/how-to-define-value-equality-for-a-type)
+
+### Comparison Rules
+Entities support ordering and sorting based on their identifiers.
+
+| Scenario | Result | Explanation |
+|-----------------------------------------------|------------------------------|----------------------------------------------------------------------------------------------------|
+| Same type, same Id                            | 0️⃣&nbsp;Zero                | *Entities with identical Id values are considered equal in comparison.*                            |
+| Same type, Id is greater than other Id        | ➕&nbsp;Positive&nbsp;value | *Entity with a greater Id is considered larger.*                                                   |
+| Same type, Id is smaller than other Id        | ➖&nbsp;Negative&nbsp;value | *Entity with a smaller Id is considered smaller.*                                                  |
+| Same type, other Id is null or default        | ➕&nbsp;Positive&nbsp;value | *Entity with a default Id (e.g., null or 0) is considered smaller than an entity with a valid Id.* |
+| Same type, both Id values are null or default | 0️⃣&nbsp;Zero                | *Two entities with the same default Id (e.g., null or 0) are considered equal in comparison.*      |
+| Different runtime types                       | ❗&nbsp;ArgumentException   | *Entities of different types cannot be meaningfully compared.*                                     |
+| Other entity is null                          | ➕&nbsp;Positive&nbsp;value | *Any entity is always greater than null.*                                                          |
+> ⚠️ **Warning:** *Comparison of two entities with null or default Id values returns 0, even though `Equals` returns false. This is because `CompareTo` is designed for sorting, not for determining entity equality*.
+
+**📝 Example:**
+```csharp
+
+// Same type, same Id
+var order1 = new Order(1);
+var order2 = new Order(1);
+order1.CompareTo(order2);                                                     //    0️⃣ Zero
+
+// Same type, Id is greater than other Id
+var order1 = new Order(2);
+var order2 = new Order(1);
+order1.CompareTo(order2);                                                     // 1  ➕ Positive value
+
+// Same type, Id is smaller than other Id
+var order1 = new Order(1);
+var order2 = new Order(2);
+order1.CompareTo(order2);                                                     // -1 ➖ Negative value
+
+// Same type, other Id is null or default
+var order1 = new Order(1);
+var order2 = new Order();
+order1.CompareTo(order2);                                                     // 1  ➕ Positive value
+
+// Same type, both Id values are null or default
+var order1 = new Order(1);
+var order2 = new Order();
+order1.CompareTo(order2);                                                     //    0️⃣ Zero
+
+// Different runtime types
+var order = new Order(1);
+var invoice = new Invoice(1);
+order.CompareTo(invoice);                                                     //    ❗ ArgumentException
+
+// Same type, both Id values are null or default
+var order1 = new Order(1);
+Order order2 = null;
+order1.CompareTo(order2);                                                     // 1  ➕ Positive value
+```
+**🛠 Key Aspects of Implementation:**
+- Implements `IComparable<Entity<TId>` interface to provide a strongly typed comparison method for ordering members of a generic collection object.
+- Implements `IComparable` interface to provide a generalized type-specific comparison method.
+- Overridden `CompareTo(object)` method delegates to `CompareTo(Entity<TId)`, ensuring consistent results.
+- Overridden `CompareTo(object)` method ensures type safety, throwing an `ArgumentException` if the object is not an `Entity<TId>.
+- When comparing two entities with null or default Id, `CompareTo` returns 0, even though `Equals` returns false. This behavior ensures stable sorting while maintaining strict identity comparison.
+
+
+## AggregateRoot
+## IDomainEvent
 ---
 
 ## 🤝 Contributing
