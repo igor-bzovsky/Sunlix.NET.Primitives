@@ -21,40 +21,62 @@ The package is available on NuGet. You can install it using the following comman
 
 ```sh
 dotnet add package Sunlix.NET.Primitives
-```  
+```
+#### Installing from Source (GitHub)  
+If you prefer to install the library directly from the source code, you can clone the repository and reference the project in your solution:
+
+```sh
+git clone https://github.com/Sunlix-Software/Sunlix.NET.Primitives.git
+```
+Then, add a project reference in your .csproj file:
+```sh
+<ItemGroup>
+    <ProjectReference Include="..\Sunlix.NET.Primitives\src\Sunlix.NET.Primitives.csproj" />
+</ItemGroup>
+```
 #### Minimum Requirements  
 Compatible with **.NET 6**, **.NET 8**, and **.NET 9**.  
-
 The library has no external dependencies and can be used in any .NET application.
 
 ##  Overview of Core Concepts
 
 
 ##  Usage
+This section covers the fundamental base classes and structures used in Sunlix.NET.Primitives, along with usage examples and important implementation nuances.
+
 ### Entity
 An **Entity** represents an object with a distinct and persistent identity, uniquely identified by an identifier rather than its attributes. Entities are designed to model domain concepts that require continuity over time, ensuring that their identity remains stable despite changes to their attributes. Entities enable the tracking and management of domain objects with unique identities, such as users, orders, or products, within the context of a domain model.
 
-#### 🎯 Key Characteristics
-- **Identity-based equality** – Two entities are equal if they share the same `Id`.
-- **Persistence** – Entity identity remains constant throughout its lifecycle.
-- **Mutable attributes** – The values of an entity's attributes may change, but its identity does not.
+#### 🔑 Key Characteristics
+🔹 **Identity-based equality** – Two entities are equal if they share the same `Id`.  
+🔹 **Persistence** – Entity identity remains constant throughout its lifecycle.  
+🔹 **Mutable attributes** – The values of an entity's attributes may change, but its identity does not.
 
 **📝 Example:**
 ```csharp
 public class Order : Entity<int>
 {
-    public Money TotalAmount { get; set; }
+    public virtual Money? TotalAmount { get; private set; }
 
-    public Order() { }
-
-    public Order(int id, Money totalAmount) : base(id)
+    private Order() { }
+    public Order(int id, Money? totalAmount) : base(id)
     {
         TotalAmount = totalAmount;
     }
+
+    public void UpdateTotalAmount(Money totalAmount)
+    {
+        if (totalAmount is null)
+            throw new ArgumentNullException(nameof(totalAmount), "Total amount cannot be null.");
+        TotalAmount = newAmount;
+    }
 }
 ```
+> **📄 Note:** *The `Entity<TId>` class includes a parameterless protected constructor and a virtual `Id` property to support compatibility with Object-Relational Mappers (ORMs) like NHibernate, which require a [parameterless constructor](https://nhibernate.info/doc/nhibernate-reference/persistent-classes.html#persistent-classes-poco-constructor) for entity instantiation. Although Entity Framework Core supports [parameterized constructors](https://learn.microsoft.com/en-us/ef/core/modeling/constructors), it still requires navigation properties to be virtual to enable [proxy-based lazy loading](https://learn.microsoft.com/en-us/ef/core/querying/related-data/lazy).*
+>
+> *This design choice introduces a trade-off where persistence concerns slightly leak into the domain model, but it enables seamless integration with the ORM frameworks.* 
 
-#### ✅ Equality Rules
+#### ⚖️ Equality Rules
 Entities follow identifier equality rather than structural equality.
 
 | Scenario | Explanation | Result |
@@ -67,37 +89,37 @@ Entities follow identifier equality rather than structural equality.
 | Default Id (null or default(TId)) | *Entities with default Id values (e.g., null or 0) are not considered equal, as default Id typically indicates an uninitialized state.* | ❌ |
 
 > **⚠️ Warning:** *if one entity inherits from another and they share the same Id, they will still not be considered equal.*
-
-**📝 Example**:
+**📝 Example:**
 ```csharp
 // Same object reference
-var order1 = new Order(id: 1, totalAmount: 10);
+var order1 = new Order(id: 1, totalAmount: new Money(10, "USD"));
 var order2 = order1;
-order1.Equals(order2));                            // ✅ True
+order1.Equals(order2);                                                        // ✅ True
 
 // Same type, same Id
-var order1 = new Order(id: 1, totalAmount: 10);
-var order2 = new Order(id: 1, totalAmount: 20);
-order1.Equals(order2));                            // ✅ True
+var order1 = new Order(id: 1, totalAmount: new Money(10, "USD"));
+var order2 = new Order(id: 1, totalAmount: new Money(20, "USD"));
+order1.Equals(order2);                                                        // ✅ True
 
 // Same type, different Id
-var order1 = new Order(id: 1, totalAmount: 10);
-var order2 = new Order(id: 2, totalAmount: 20);
-order1.Equals(order2));                            // ❌ False
+var order1 = new Order(id: 1, totalAmount: new Money(10, "USD"));
+var order2 = new Order(id: 2, totalAmount: new Money(20, "USD"));
+order1.Equals(order2);                                                        // ❌ False
 
 // Different type
-var order1 = new Order(id: 1, totalAmount: 10);
-var user1 = new User(id: 1, ssn: "123-45-6789");
-order1.Equals(user1));                             // ❌ False
+var order = new Order(id: 1, totalAmount: new Money(10, "USD"));
+var invoice = new Invoice(id: 1, totalAmount: new Money(20, "USD"));
+order.Equals(invoice);                                                        // ❌ False
 
 // Other entity is null
-var order1 = new Order(id: 1, totalAmount: 10);
-order1.Equals(null!));                             // ❌ False
+var order1 = new Order(id: 1, totalAmount: new Money(10, "USD"));
+Order order2 = null;
+order1.Equals(order2);                                                        // ❌ False
 
 // Default Id (null or default(TId))
 var order1 = new Order();
 var order2 = new Order();
-order1.Equals(order2));                            // ❌ False
+order1.Equals(order2);                                                        // ❌ False
 ```
 ---
 
