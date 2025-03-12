@@ -82,11 +82,15 @@ An **Entity** represents an object with a distinct and persistent identity, uniq
       }
   }
   ```
+  
+  **📌 Implementation guidelines:**
+  
+  🔹 **Use POCO (Plain Old CLR Object) Classes**  
+When implementing an entity, it is best to use a POCO (Plain Old CLR Object) class. A POCO class is a simple C# class that does not inherit from any framework-specific base classes and does not rely and does not include any attributes or code tied to a specific ORM framework.  This means that entities should follow the [Persistence Ignorance](https://deviq.com/persistence-ignorance/) and [Infrastructure Ignorance principles](https://ayende.com/blog/3137/infrastructure-ignorance).
   > **📄 Note:** *The `Entity<TId>` class includes a parameterless protected constructor and a virtual `Id` property to support compatibility with Object-Relational Mappers (ORMs) like NHibernate, which [require a parameterless constructor](https://nhibernate.info/doc/nhibernate-reference/persistent-classes.html#persistent-classes-poco-constructor) for entity instantiation. Although Entity Framework Core [supports parameterized constructors](https://learn.microsoft.com/en-us/ef/core/modeling/constructors), it still requires navigation properties to be virtual to enable [proxy-based lazy loading](https://learn.microsoft.com/en-us/ef/core/querying/related-data/lazy).*
   >
-  > *This design choice introduces a trade-off where persistence concerns slightly leak into the domain model, but it enables seamless integration with the ORM frameworks.*
+  > *This design choice introduces a trade-off where persistence concerns slightly leak into the domain model, but it enables seamless integration with the ORM frameworks. The entity itself does not rely on any external dependencies.*
 
-  **📌 Implementation guidelines:**
   
   🔹 **Use a Meaningful Identifier Type.** The identifier type (TId) should be clear and appropriate for the domain.
 
